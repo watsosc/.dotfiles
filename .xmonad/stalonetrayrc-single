@@ -1,0 +1,23 @@
+# stalonetray config used by Vic Fryzel
+# Author: Vic Fryzel
+# https://github.com/vicfryzel/xmonad-config
+
+
+# If you're using a single display with a different resolution, adjust the
+# geometry below using the given calculation.
+
+# 1 row of 12 icons, each 23px wide/tall. Resolution 2560x1440.
+# This icon size aligns with the size of xmobar with font "xft:monospace-8"
+# position = display_width - (num_icons * icon_size)
+# position = 2560 - (12 * 23) = 2284
+# Example: geometry 12x1+2284
+geometry 12x1+2332
+icon_size 19
+sticky 1
+window_type dock
+dockapp_mode wmaker
+window_strut auto
+skip_taskbar 1
+icon_gravity NE
+background black
+kludges force_icons_size
