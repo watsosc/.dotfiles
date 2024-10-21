@@ -1,4 +1,11 @@
+local g = vim.g
+
+g["test#strategy"] = "neovim"
+
 return {
+	{
+		"vim-test/vim-test",
+	},
 	{
 		"nvim-neotest/neotest",
 		dependencies = {
@@ -8,6 +15,8 @@ return {
 			"antoinemadec/FixCursorHold.nvim",
 			"haydenmeade/neotest-jest",
 			"mrcjkb/neotest-haskell",
+			"vim-test/vim-test",
+			"nvim-neotest/neotest-vim-test",
 		},
 		opts = function()
 			return {
@@ -19,22 +28,22 @@ return {
 						build_tools = { "stack", "cabal" },
 						frameworks = { "tasty", "hspec", "sydtest" },
 					}),
+					require("neotest-vim-test")({
+						allow_file_types = { "ruby" },
+					}),
 				},
 			}
 		end,
 		keys = {
-			{ "<leader>tw", "<cmd>lua require('neotest').run.run()<cr>", desc = "Run all tests" },
-			{ "<leader>tf", "<cmd>lua require('neotest').run.run(vim.fn.expand(' % '))<cr>", desc = "Run this test" },
-			{ "<leader>ts", "<cmd>lua require('neotest').run.stop()<cr>", desc = "Stop running tests" },
-			{ "<leader>tl", "<cmd>lua require('neotest').run.last()<cr>", desc = "Run last test" },
-			{ "<leader>tr", "<cmd>lua require('neotest').run.repeat()<cr>", desc = "Repeat last test" },
-			{ "<leader>td", "<cmd>lua require('neotest').run.debug()<cr>", desc = "Debug test" },
-			{ "<leader>ta", "<cmd>lua require('neotest').run.attach()<cr>", desc = "Attach to test" },
-			{ "<leader>tv", "<cmd>lua require('neotest').run.visit()<cr>", desc = "Visit test" },
+			{ "<leader>tt", "<cmd>lua require('neotest').run.run()<cr>", desc = "[T]est Neares[t]" },
+			{ "<leader>tf", "<cmd>lua require('neotest').run.run(vim.fn.expand(' % '))<cr>", desc = "[T]est [F]ile" },
+			{ "<leader>ts", "<cmd>lua require('neotest').run.stop()<cr>", desc = "[T]est [S]top" },
+			{ "<leader>td", "<cmd>lua require('neotest').run.run({strategy = 'dap'})<cr>", desc = "[T]est [D]ebug" },
+			{ "<leader>ta", "<cmd>lua require('neotest').run.attach()<cr>", desc = "[T]est [A]ttach" },
 			{
 				"<leader>to",
 				"<cmd>lua require('neotest').output_panel.toggle({ last_run = true })<cr>",
-				desc = "Toggle output panel",
+				desc = "[T]est [O]pen Panel",
 			},
 		},
 	},
