@@ -36,7 +36,7 @@ return {
 		end,
 		keys = {
 			{ "<leader>tt", "<cmd>lua require('neotest').run.run()<cr>", desc = "[T]est Neares[t]" },
-			{ "<leader>tf", "<cmd>lua require('neotest').run.run(vim.fn.expand(' % '))<cr>", desc = "[T]est [F]ile" },
+			{ "<leader>tf", "<cmd>lua require('neotest').run.run(vim.fn.expand('%'))<cr>", desc = "[T]est [F]ile" },
 			{ "<leader>ts", "<cmd>lua require('neotest').run.stop()<cr>", desc = "[T]est [S]top" },
 			{ "<leader>td", "<cmd>lua require('neotest').run.run({strategy = 'dap'})<cr>", desc = "[T]est [D]ebug" },
 			{ "<leader>ta", "<cmd>lua require('neotest').run.attach()<cr>", desc = "[T]est [A]ttach" },
