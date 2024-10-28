@@ -22,19 +22,17 @@ return {
 			return {
 				adapters = {
 					require("neotest-jest")({
-						jestCommand = "npm test -- --watch",
+						jestCommand = "yarn test -- --watch",
 					}),
-					require("neotest-haskell")({
-						build_tools = { "stack", "cabal" },
-						frameworks = { "tasty", "hspec", "sydtest" },
-					}),
+					require("neotest-haskell"),
 					require("neotest-vim-test")({
-						allow_file_types = { "ruby" },
+						ignore_filetypes = { "typescript", "javascript", "tsx", "haskell" },
 					}),
 				},
 			}
 		end,
 		keys = {
+			{ "<leader>ty", "<cmd>lua require('neotest').summary.toggle()<cr>", desc = "[T]est Summar[y]" },
 			{ "<leader>tt", "<cmd>lua require('neotest').run.run()<cr>", desc = "[T]est Neares[t]" },
 			{ "<leader>tf", "<cmd>lua require('neotest').run.run(vim.fn.expand('%'))<cr>", desc = "[T]est [F]ile" },
 			{ "<leader>ts", "<cmd>lua require('neotest').run.stop()<cr>", desc = "[T]est [S]top" },
