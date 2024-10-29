@@ -120,6 +120,11 @@ function spinssh() {
 alias spinsi='open https://app.shopify.$(spin show -o fqdn)/services/internal'
 alias grsm='git reset --soft $(git_main_branch)'
 
+alias cv='dev cd customer-view'
+alias pos='dev cd pos-next-react-native'
+alias shopify='dev cd shopify'
+alias pos-channel='dev cd pos-channel'
+
 [ -f /opt/dev/dev.sh ] && source /opt/dev/dev.sh
 if [ -e /Users/seanwatson/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/seanwatson/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
