@@ -20,7 +20,7 @@ xrandr --output HDMI-0 --auto --output DP-0 --mode 2560x1440 --right-of HDMI-0 &
 feh --bg-scale ~/Downloads/mountains_image.jpg &
 
 # Start the system tray
-stalonetray -c ~/.xmonad/stalonetrayrc-dual &
+stalonetray -c ~/.config/xmonad/stalonetrayrc-dual &
 
 # Start terminal
 kitty &
@@ -32,7 +32,4 @@ firefox &
 # Start screensaver
 xscreensaver -no-splash &
 
-# Start pulseaudio
-pulseaudio --start &
-
-exec xmonad
+exec ~/.local/bin/xmonad

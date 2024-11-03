@@ -6,4 +6,4 @@ xmonad.state
 xmonad-git
 xmonad-contrib-git
 xmobar-git
-.stack-work
+.stack-work/
