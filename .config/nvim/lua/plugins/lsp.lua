@@ -11,6 +11,9 @@ return {
 			},
 		},
 	},
+	{
+		"tpope/vim-rails",
+	},
 	{ "Bilal2453/luvit-meta", lazy = true },
 	{
 		-- Main LSP Configuration
