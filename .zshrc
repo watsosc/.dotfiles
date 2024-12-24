@@ -117,13 +117,15 @@ function spinssh() {
 	TERM=xterm-256color kitty +kitten ssh $SPINNAME 
 }
 
-alias spinsi='open https://app.shopify.$(spin show -o fqdn)/services/internal'
 alias grsm='git reset --soft $(git_main_branch)'
+alias gcfi='git commit --fixup'
+alias glog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all"
 
-alias cv='dev cd customer-view'
+alias cv='dev cd customerview'
 alias pos='dev cd pos-next-react-native'
 alias shopify='dev cd shopify'
 alias pos-channel='dev cd pos-channel'
+alias web='dev cd web'
 
 [ -f /opt/dev/dev.sh ] && source /opt/dev/dev.sh
 if [ -e /Users/seanwatson/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/seanwatson/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
