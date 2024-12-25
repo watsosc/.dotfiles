@@ -1,13 +1,13 @@
 return {
-  {
-    'zbirenbaum/copilot.lua',
-    opts = {
-      suggestion = {
-        auto_trigger = true,
-        keymap = {
-          accept = '<C-y>',
-        },
-      },
-    },
-  },
+	{
+		"zbirenbaum/copilot.lua",
+		opts = {
+			suggestion = {
+				auto_trigger = true,
+				keymap = {
+					accept = "<C-Y>",
+				},
+			},
+		},
+	},
 }

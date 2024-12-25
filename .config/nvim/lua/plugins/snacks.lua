@@ -14,4 +14,8 @@ return {
 			words = { enabled = true },
 		},
 	},
+	{
+		"numToStr/Comment.nvim",
+		opts = {},
+	},
 }
