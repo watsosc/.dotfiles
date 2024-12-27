@@ -9,7 +9,7 @@ function M.pick(kind)
 			return
 		end
 		local ok = pcall(require, "fzf-lua")
-		require("CopilotChat.integrations." .. (ok and "fzflua" or "telescope")).pick(items)
+		require("CopilotChat.integrations." .. (ok and "fzflua")).pick(items)
 	end
 end
 
