@@ -15,8 +15,8 @@ return {
 			"antoinemadec/FixCursorHold.nvim",
 			"haydenmeade/neotest-jest",
 			"mrcjkb/neotest-haskell",
+			"zidhuss/neotest-minitest",
 			"vim-test/vim-test",
-			"nvim-neotest/neotest-vim-test",
 		},
 		opts = function()
 			return {
@@ -25,9 +25,7 @@ return {
 						jestCommand = "yarn test -- --watch",
 					}),
 					require("neotest-haskell"),
-					require("neotest-vim-test")({
-						ignore_filetypes = { "typescript", "javascript", "tsx", "haskell" },
-					}),
+					require("neotest-minitest"),
 				},
 			}
 		end,

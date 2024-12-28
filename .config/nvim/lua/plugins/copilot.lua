@@ -9,7 +9,7 @@ function M.pick(kind)
 			return
 		end
 		local ok = pcall(require, "fzf-lua")
-		require("CopilotChat.integrations." .. (ok and "fzflua")).pick(items)
+		require("CopilotChat.integrations." .. ok).pick(items)
 	end
 end
 
@@ -20,7 +20,7 @@ return {
 			suggestion = {
 				auto_trigger = true,
 				keymap = {
-					accept = "<C-J>",
+					accept = "<C-y>",
 				},
 			},
 		},
@@ -43,9 +43,9 @@ return {
 		end,
 		keys = {
 			{ "<c-s>", "<CR>", ft = "copilot-chat", desc = "Submit Prompt", remap = true },
-			{ "<leader>h", "", desc = "+ai", mode = { "n", "v" } },
+			{ "<leader>o", "", desc = "+ai", mode = { "n", "v" } },
 			{
-				"<leader>ha",
+				"<leader>oa",
 				function()
 					return require("CopilotChat").toggle()
 				end,
@@ -53,7 +53,7 @@ return {
 				mode = { "n", "v" },
 			},
 			{
-				"<leader>hx",
+				"<leader>ox",
 				function()
 					return require("CopilotChat").reset()
 				end,
@@ -61,7 +61,7 @@ return {
 				mode = { "n", "v" },
 			},
 			{
-				"<leader>hq",
+				"<leader>oq",
 				function()
 					local input = vim.fn.input("Quick Chat: ")
 					if input ~= "" then
@@ -72,7 +72,7 @@ return {
 				mode = { "n", "v" },
 			},
 			-- Show prompts actions with telescope
-			{ "<leader>hp", M.pick("prompt"), desc = "Prompt Actions (CopilotChat)", mode = { "n", "v" } },
+			{ "<leader>op", M.pick("prompt"), desc = "Prompt Actions (CopilotChat)", mode = { "n", "v" } },
 		},
 		config = function(_, opts)
 			local chat = require("CopilotChat")

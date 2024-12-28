@@ -2,19 +2,35 @@ return {
 	{ -- Autocompletion
 		"saghen/blink.cmp",
 		version = "*",
-		event = "InsertEnter",
 		dependencies = {
 			"L3MON4D3/LuaSnip",
-			"folke/lazydev.nvim",
+			"rafamadriz/friendly-snippets",
+			{
+				"saghen/blink.compat",
+				optional = true,
+				version = "*",
+			},
 		},
 		opts = {
 			keymap = {
 				preset = "default",
-				["<C-y>"] = { "select_and_accept" },
+				["C-y"] = { "accept", "fallback" },
 			},
 			appearance = {
-				use_nvim_cmp_as_default = true,
+				use_nvim_cmp_as_default = false,
 				nerd_font_variant = "mono",
+			},
+			completion = {
+				accept = {
+					auto_brackets = {
+						enabled = true,
+					},
+				},
+				menu = {
+					draw = {
+						treesitter = { "lsp" },
+					},
+				},
 			},
 			snippets = {
 				expand = function(snippet)

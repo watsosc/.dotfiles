@@ -126,6 +126,21 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
+vim.api.nvim_create_autocmd("User", {
+	pattern = "BlinkCmpCompletionMenuOpen",
+	callback = function()
+		require("copilot.suggestion").dismiss()
+		vim.b.copilot_suggestion_hidden = true
+	end,
+})
+
+vim.api.nvim_create_autocmd("User", {
+	pattern = "BlinkCmpCompletionMenuClose",
+	callback = function()
+		vim.b.copilot_suggestion_hidden = false
+	end,
+})
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
