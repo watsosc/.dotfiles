@@ -14,7 +14,6 @@ return {
 		opts = {
 			keymap = {
 				preset = "default",
-				["C-y"] = { "accept", "fallback" },
 			},
 			appearance = {
 				use_nvim_cmp_as_default = false,
