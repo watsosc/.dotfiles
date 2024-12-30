@@ -13,7 +13,7 @@ return {
 		},
 		opts = {
 			keymap = {
-				preset = "default",
+				preset = "super-tab",
 			},
 			appearance = {
 				use_nvim_cmp_as_default = false,
@@ -29,6 +29,11 @@ return {
 					draw = {
 						treesitter = { "lsp" },
 					},
+				},
+				list = {
+					selection = function(ctx)
+						return ctx.mode == "cmdline" and "auto_insert" or "preselect"
+					end,
 				},
 			},
 			snippets = {
