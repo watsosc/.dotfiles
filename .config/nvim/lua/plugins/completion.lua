@@ -31,12 +31,15 @@ return {
 					},
 				},
 				list = {
-					selection = function(ctx)
-						return ctx.mode == "cmdline" and "auto_insert" or "preselect"
-					end,
+					selection = {
+						preselect = function(ctx)
+							return ctx.mode == "cmdline" and "auto_insert" or "preselect"
+						end,
+					},
 				},
 			},
 			snippets = {
+				preset = "luasnip",
 				expand = function(snippet)
 					require("luasnip").lsp_expand(snippet)
 				end,
@@ -51,14 +54,7 @@ return {
 				end,
 			},
 			sources = {
-				default = { "lazydev", "lsp", "path", "luasnip", "snippets", "buffer" },
-				providers = {
-					lazydev = {
-						name = "LazyDev",
-						module = "lazydev.integrations.blink",
-						score_offset = 100,
-					},
-				},
+				default = { "lsp", "path", "snippets", "buffer" },
 			},
 		},
 		opts_extend = { "sources.default" },

@@ -8,6 +8,7 @@ return {
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
+		version = "*",
 		opts = function()
 			local config = require("fzf-lua.config")
 			local actions = require("fzf-lua.actions")
@@ -29,6 +30,7 @@ return {
 				defaults = {
 					-- formatter = "path.filename_first",
 					formatter = "path.dirname_first",
+					no_header = true,
 				},
 				winopts = {
 					width = 0.8,
@@ -61,9 +63,6 @@ return {
 							return s:lower() .. "\t"
 						end,
 						child_prefix = false,
-					},
-					code_actions = {
-						previewer = vim.fn.executable("delta") == 1 and "codeaction_native" or nil,
 					},
 				},
 			}

@@ -18,10 +18,14 @@ return {
 	{
 		-- Main LSP Configuration
 		"neovim/nvim-lspconfig",
+		version = "*",
 		dependencies = {
 			-- Automatically install LSPs and related tools to stdpath for Neovim
 			{ "williamboman/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
-			"williamboman/mason-lspconfig.nvim",
+			{
+				"williamboman/mason-lspconfig.nvim",
+				version = "1.32.0",
+			},
 			{
 				"j-hui/fidget.nvim",
 				opts = {
@@ -32,7 +36,6 @@ return {
 					},
 				},
 			},
-			-- Allows extra capabilities provided by nvim-cmp
 			"saghen/blink.cmp",
 			"onsails/lspkind.nvim",
 			"nvimtools/none-ls.nvim",
@@ -93,6 +96,15 @@ return {
 			--    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
 			--    function will be executed to configure the current buffer
 			local lsp = require("lspconfig")
+
+			local function has_sorbet_directory()
+				local sorbet_dir = vim.fn.finddir("sorbet", vim.fn.getcwd() .. ";")
+				return sorbet_dir ~= ""
+			end
+
+			local function rubocop_binstub()
+				return vim.fn.filereadable("./bin/rubocop") == 1
+			end
 
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
@@ -221,6 +233,7 @@ return {
 					"eslint",
 					"jsonls",
 					"stylelint_lsp",
+					"rubocop",
 				},
 				handlers = {
 					default_setup,
@@ -238,6 +251,32 @@ return {
 								},
 							},
 						})
+					end,
+					sorbet = function()
+						if has_sorbet_directory() then
+							lsp.sorbet.setup({
+								capabilities = capabilities,
+							})
+						end
+					end,
+					ruby_lsp = function()
+						if not has_sorbet_directory() then
+							lsp.ruby_lsp.setup({
+								capabilities = capabilities,
+							})
+						end
+					end,
+					rubocop = function()
+						if rubocop_binstub() then
+							lsp.rubocop.setup({
+								cmd = { "./bin/rubocop", "--lsp" },
+								capabilities = capabilities,
+							})
+						else
+							lsp.rubocop.setup({
+								capabilities = capabilities,
+							})
+						end
 					end,
 				},
 			})

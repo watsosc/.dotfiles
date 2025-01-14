@@ -14,9 +14,11 @@ return {
 			"nvim-treesitter/nvim-treesitter",
 			"antoinemadec/FixCursorHold.nvim",
 			"haydenmeade/neotest-jest",
-			"mrcjkb/neotest-haskell",
 			"zidhuss/neotest-minitest",
 			"vim-test/vim-test",
+		},
+		discovery = {
+			enabled = false,
 		},
 		opts = function()
 			return {
@@ -24,7 +26,6 @@ return {
 					require("neotest-jest")({
 						jestCommand = "yarn test -- --watch",
 					}),
-					require("neotest-haskell"),
 					require("neotest-minitest"),
 				},
 			}
