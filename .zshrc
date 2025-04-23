@@ -123,9 +123,9 @@ alias glog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold 
 
 alias cv='dev cd customerview'
 alias pos='dev cd pos-next-react-native'
-alias shopify='dev cd shopify'
+alias shopify='dev cd //areas/core/shopify'
 alias pos-channel='dev cd pos-channel'
-alias web='dev cd web'
+alias web='dev cd //areas/clients/admin-web'
 
 [ -f /opt/dev/dev.sh ] && source /opt/dev/dev.sh
 if [ -e /Users/seanwatson/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/seanwatson/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
@@ -146,3 +146,5 @@ export EDITOR="nvim"
 [[ -f /opt/dev/sh/chruby/chruby.sh ]] && { type chruby >/dev/null 2>&1 || chruby () { source /opt/dev/sh/chruby/chruby.sh; chruby "$@"; } }
 
 eval "$(starship init zsh)"
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"

@@ -37,6 +37,7 @@ return {
 				ruby = { "rubocop" },
 				typescript = { "prettier" },
 				yaml = { "prettier" },
+				kotlin = { "ktlint" },
 				-- Conform can also run multiple formatters sequentially
 				-- python = { "isort", "black" },
 				--

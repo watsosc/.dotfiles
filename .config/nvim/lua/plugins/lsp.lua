@@ -46,9 +46,7 @@ return {
 				config = function()
 					local nvim_lsp = require("lspconfig")
 					require("typescript-tools").setup({
-						single_file_support = os.getenv("SPIN") ~= nil,
 						settings = {
-							separate_diagnostic_server = os.getenv("SPIN") == nil,
 							tsserver_max_memory = 10240,
 							root_dir = nvim_lsp.util.root_pattern("package.json"),
 						},
@@ -234,6 +232,7 @@ return {
 					"jsonls",
 					"stylelint_lsp",
 					"rubocop",
+					"kotlin_language_server",
 				},
 				handlers = {
 					default_setup,
@@ -278,10 +277,34 @@ return {
 							})
 						end
 					end,
+					kotlin_language_server = function()
+						lsp.kotlin_language_server.setup({
+							capabilities = capabilities,
+							settings = {
+								kotlin = {
+									compiler = {
+										jvm = {
+											target = "17"
+										}
+									},
+									debugAdapter = {
+										enabled = true
+									},
+									formatter = {
+										enabled = true
+									}
+								}
+							},
+							init_options = {
+								storagePath = vim.fn.stdpath("data") .. "/kotlin-language-server",
+								transport = "stdio"
+							}
+						})
+					end,
 				},
 			})
 			require("mason-null-ls").setup({
-				ensure_installed = {},
+				ensure_installed = { "ktlint" },
 				automatic_installation = false,
 				handlers = {},
 			})
@@ -291,6 +314,8 @@ return {
 					null_ls.builtins.formatting.prettier.with({
 						prefer_local = "node_modules/.bin",
 					}),
+					null_ls.builtins.formatting.ktlint,
+					null_ls.builtins.diagnostics.ktlint,
 				},
 			})
 		end,

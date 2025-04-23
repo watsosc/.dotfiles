@@ -23,7 +23,19 @@ return {
 					accept = "<C-j>",
 				},
 			},
+			server_opts_overrides = {
+				nodeCommand = "node", -- Try using explicit node path if needed
+			},
 		},
+		-- Force reinstall to fix missing files
+		build = function()
+			-- Force copilot to reinstall if missing files
+			local copilot_dir = vim.fn.stdpath("data") .. "/lazy/copilot.lua"
+			if vim.fn.isdirectory(copilot_dir) == 1 then
+				vim.notify("Reinstalling Copilot dependencies...", vim.log.levels.INFO)
+				vim.fn.system("cd " .. copilot_dir .. " && npm install")
+			end
+		end,
 	},
 	{
 		"CopilotC-Nvim/CopilotChat.nvim",

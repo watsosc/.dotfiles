@@ -86,7 +86,7 @@ return {
 				"<CMD>lua require('fzf-lua').grep_cword( { root = false })<CR>",
 				desc = "[S]earch Current [W]ord (cwd)",
 			},
-			{ "<leader>sg", "<CMD>lua require('fzf-lua').live_grep()<CR>", desc = "[S]earch by [G]rep" },
+			{ "<leader>sg", "<CMD>lua require('fzf-lua').live_grep({file_type_query=true})<CR>", desc = "[S]earch by [G]rep" },
 			{
 				"<leader>sG",
 				"<CMD>lua require('fzf-lua').live_grep( { root = false })<CR>",

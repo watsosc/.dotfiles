@@ -35,6 +35,8 @@ return {
         'markdown',
         'haskell',
         'ruby',
+        'kotlin',
+        'query',
       },
       sync_install = false,
       auto_install = true,
@@ -75,21 +77,25 @@ return {
             [']v'] = '@function.outer',
             [']c'] = '@class.outer',
             [']p'] = '@parameter.outer',
+            [']t'] = '@test.outer',
           },
           goto_next_end = {
             [']V'] = '@function.outer',
             [']C'] = '@class.outer',
             [']P'] = '@parameter.outer',
+            [']T'] = '@test.outer',
           },
           goto_previous_start = {
             ['[v'] = '@function.outer',
             ['[c'] = '@class.outer',
             ['[p'] = '@parameter.outer',
+            ['[t'] = '@test.outer',
           },
           goto_previous_end = {
             ['[V'] = '@function.outer',
             ['[C'] = '@class.outer',
             ['[P'] = '@parameter.outer',
+            ['[T'] = '@test.outer',
           },
         },
         swap = {
@@ -104,6 +110,7 @@ return {
       },
     },
     config = function(_, opts)
+      -- Configure Treesitter
       require('nvim-treesitter.configs').setup(opts)
     end,
   },

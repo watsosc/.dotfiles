@@ -34,6 +34,7 @@ return {
 			keymap.set("n", "<leader>gc", ":G commit<CR>", { desc = "[G]it [C]ommit" })
 			keymap.set("n", "<leader>gp", ":G push<CR>", { desc = "[G]it [P]ush" })
 			keymap.set("n", "<leader>ga", ":G add --all", { desc = "[G]it Add [A]ll" })
+			keymap.set("n", "<leader>gl", ":GBrowse<CR>", { desc = "[G]ithub [L]ink" })
 		end,
 	},
 }
