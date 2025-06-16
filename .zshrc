@@ -121,7 +121,7 @@ alias grsm='git reset --soft $(git_main_branch)'
 alias gcfi='git commit --fixup'
 alias glog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all"
 
-alias cv='dev cd customerview'
+alias cv='dev cd customerview-mobile'
 alias pos='dev cd pos-next-react-native'
 alias shopify='dev cd //areas/core/shopify'
 alias pos-channel='dev cd pos-channel'
@@ -148,3 +148,5 @@ export EDITOR="nvim"
 eval "$(starship init zsh)"
 export PATH="$HOME/.jenv/bin:$PATH"
 eval "$(jenv init -)"
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+export PATH="$JAVA_HOME/bin:$PATH"

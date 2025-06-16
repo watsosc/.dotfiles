@@ -232,7 +232,6 @@ return {
 					"jsonls",
 					"stylelint_lsp",
 					"rubocop",
-					"kotlin_language_server",
 				},
 				handlers = {
 					default_setup,
@@ -277,32 +276,28 @@ return {
 							})
 						end
 					end,
-					kotlin_language_server = function()
-						lsp.kotlin_language_server.setup({
-							capabilities = capabilities,
-							settings = {
-								kotlin = {
-									compiler = {
-										jvm = {
-											target = "17"
-										}
-									},
-									debugAdapter = {
-										enabled = true
-									},
-									formatter = {
-										enabled = true
-									}
-								}
-							},
-							init_options = {
-								storagePath = vim.fn.stdpath("data") .. "/kotlin-language-server",
-								transport = "stdio"
-							}
-						})
-					end,
 				},
 			})
+
+			-- Setup JetBrains Official Kotlin LSP (manual configuration)
+			-- Note: Requires the kotlin-lsp to be installed separately
+			-- Download from: https://github.com/Kotlin/kotlin-lsp
+			lsp.kotlin_lsp = {
+				default_config = {
+					cmd = { "kotlin-lsp" },
+					filetypes = { "kotlin" },
+					root_dir = lsp.util.root_pattern("build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts"),
+					settings = {},
+				},
+			}
+
+			lsp.kotlin_lsp.setup({
+				capabilities = capabilities,
+				cmd = { "kotlin-lsp" },
+				filetypes = { "kotlin" },
+				root_dir = lsp.util.root_pattern("build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts"),
+			})
+
 			require("mason-null-ls").setup({
 				ensure_installed = { "ktlint" },
 				automatic_installation = false,

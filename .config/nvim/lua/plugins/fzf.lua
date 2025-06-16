@@ -26,6 +26,7 @@ return {
 				fzf_colors = true,
 				fzf_opts = {
 					["--no-scrollbar"] = true,
+					["--layout"] = "reverse",
 				},
 				defaults = {
 					-- formatter = "path.filename_first",
@@ -79,14 +80,14 @@ return {
 			},
 			{ "<leader>sh", "<CMD>lua require('fzf-lua').helptags()<CR>", desc = "[S]earch [H]elp" },
 			{ "<leader>sk", "<CMD>lua require('fzf-lua').keymaps()<CR>", desc = "[S]earch [K]eymaps" },
-			{ "<leader>sf", "<CMD>lua require('fzf-lua').files()<CR>", desc = "[S]earch [F]iles" },
+			{ "<leader>sf", "<CMD>lua require('fzf-lua').files({fd_opts='--type f --exclude \"*.rbi\"'})<CR>", desc = "[S]earch [F]iles" },
 			{ "<leader>sw", "<CMD>lua require('fzf-lua').grep_cword()<CR>", desc = "[S]earch Current [W]ord" },
 			{
 				"<leader>sW",
 				"<CMD>lua require('fzf-lua').grep_cword( { root = false })<CR>",
 				desc = "[S]earch Current [W]ord (cwd)",
 			},
-			{ "<leader>sg", "<CMD>lua require('fzf-lua').live_grep({file_type_query=true})<CR>", desc = "[S]earch by [G]rep" },
+			{ "<leader>sg", "<CMD>lua require('fzf-lua').live_grep({file_type_query=false, no_header_i=true, rg_opts='--column --line-number --no-heading --color=always --smart-case -g \"!*.rbi\" -g \"!.git/\"'})<CR>", desc = "[S]earch by [G]rep" },
 			{
 				"<leader>sG",
 				"<CMD>lua require('fzf-lua').live_grep( { root = false })<CR>",
