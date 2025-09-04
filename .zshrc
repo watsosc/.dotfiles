@@ -150,3 +150,17 @@ export PATH="$HOME/.jenv/bin:$PATH"
 eval "$(jenv init -)"
 export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
 export PATH="$JAVA_HOME/bin:$PATH"
+
+# Auto-launch zellij with session management
+if [[ -z "$ZELLIJ" && -z "$SSH_CONNECTION" && -z "$INSIDE_EMACS" && "$TERM_PROGRAM" != "vscode" ]]; then
+    # Get list of active sessions
+    sessions=$(zellij list-sessions 2>/dev/null)
+    if [[ $? -eq 0 && -n "$sessions" ]]; then
+        # Sessions exist, attach to the first one
+        session_name=$(echo "$sessions" | head -n1 | cut -d' ' -f1)
+        zellij attach "$session_name" 2>/dev/null || zellij
+    else
+        # No sessions exist, create a new one
+        zellij
+    fi
+fi

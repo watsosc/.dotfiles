@@ -100,9 +100,6 @@ return {
 				return sorbet_dir ~= ""
 			end
 
-			local function rubocop_binstub()
-				return vim.fn.filereadable("./bin/rubocop") == 1
-			end
 
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
@@ -122,33 +119,33 @@ return {
 					map("<leader>ep", vim.diagnostic.goto_prev, "Open [D]iagnostic [P]rev")
 
 					map("<leader>f", function()
-						vim.lsp.buf.format({ timeout_ms = 10000 })
+						require("conform").format({ async = true, lsp_format = "fallback" })
 					end, "[F]ormat current buffer")
 
 					-- Jump to the definition of the word under your cursor.
 					--  This is where a variable was first declared, or where a function is defined, etc.
 					--  To jump back, press <C-t>.
-					map("gd", require("fzf-lua").lsp_definitions, "[G]oto [D]efinition")
+					map("gd", function() Snacks.picker.lsp_definitions() end, "[G]oto [D]efinition")
 
 					-- Find references for the word under your cursor.
-					map("gr", require("fzf-lua").lsp_references, "[G]oto [R]eferences")
+					map("gr", function() Snacks.picker.lsp_references() end, "[G]oto [R]eferences")
 
 					-- Jump to the implementation of the word under your cursor.
 					--  Useful when your language has ways of declaring types without an actual implementation.
-					map("gI", require("fzf-lua").lsp_implementations, "[G]oto [I]mplementation")
+					map("gI", function() Snacks.picker.lsp_implementations() end, "[G]oto [I]mplementation")
 
 					-- Jump to the type of the word under your cursor.
 					--  Useful when you're not sure what type a variable is and you want to see
 					--  the definition of its *type*, not where it was *defined*.
-					map("gD", require("fzf-lua").lsp_typedefs, "[G]oto Type [D]efinition")
+					map("gD", function() Snacks.picker.lsp_type_definitions() end, "[G]oto Type [D]efinition")
 
 					-- Fuzzy find all the symbols in your current document.
 					--  Symbols are things like variables, functions, types, etc.
-					map("<leader>ds", require("fzf-lua").lsp_document_symbols, "[D]ocument [S]ymbols")
+					map("<leader>ds", function() Snacks.picker.lsp_symbols() end, "[D]ocument [S]ymbols")
 
 					-- Fuzzy find all the symbols in your current workspace.
 					--  Similar to document symbols, except searches over your entire project.
-					map("<leader>ws", require("fzf-lua").lsp_live_workspace_symbols, "[W]orkspace [S]ymbols")
+					map("<leader>ws", function() Snacks.picker.lsp_symbols({ workspace = true }) end, "[W]orkspace [S]ymbols")
 
 					-- Rename the variable under your cursor.
 					--  Most Language Servers support renaming across files, etc.
@@ -226,12 +223,10 @@ return {
 					"lua_ls",
 					"graphql",
 					"html",
-					"sorbet",
-					"ruby_lsp",
 					"eslint",
 					"jsonls",
 					"stylelint_lsp",
-					"rubocop",
+					"shfmt",
 				},
 				handlers = {
 					default_setup,
@@ -250,34 +245,52 @@ return {
 							},
 						})
 					end,
-					sorbet = function()
-						if has_sorbet_directory() then
-							lsp.sorbet.setup({
-								capabilities = capabilities,
-							})
-						end
-					end,
-					ruby_lsp = function()
-						if not has_sorbet_directory() then
-							lsp.ruby_lsp.setup({
-								capabilities = capabilities,
-							})
-						end
-					end,
-					rubocop = function()
-						if rubocop_binstub() then
-							lsp.rubocop.setup({
-								cmd = { "./bin/rubocop", "--lsp" },
-								capabilities = capabilities,
-							})
-						else
-							lsp.rubocop.setup({
-								capabilities = capabilities,
-							})
-						end
-					end,
 				},
 			})
+
+			-- Configure Sorbet LSP for Ruby projects
+			if has_sorbet_directory() then
+				lsp.sorbet.setup({
+					mason = false,
+					cmd = { "bundle", "exec", "srb", "tc", "--lsp" },
+					capabilities = capabilities,
+					filetypes = { "ruby", "eruby", "rake", "irb", "rbi" },
+					root_dir = function(fname)
+						local util = require("lspconfig.util")
+						return util.root_pattern("sorbet/config", "Gemfile", ".git")(fname)
+							or util.find_git_ancestor(fname)
+							or util.path.dirname(fname)
+					end,
+					single_file_support = true,
+					settings = {},
+					init_options = {
+						highlightUntyped = false,
+					},
+					handlers = {
+						["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
+							-- Filter out T.untyped related diagnostics
+							if result and result.diagnostics then
+								result.diagnostics = vim.tbl_filter(function(diagnostic)
+									local message = diagnostic.message or ""
+									-- Filter out common T.untyped messages
+									return not (
+										message:match("T%.untyped") or
+										message:match("This code is unreachable") or
+										message:match("Method .* does not exist on T%.untyped") or
+										message:match("Call to method .* on T%.untyped")
+									)
+								end, result.diagnostics)
+							end
+							-- Call the default handler
+							vim.lsp.handlers["textDocument/publishDiagnostics"](err, result, ctx, config)
+						end,
+					},
+				})
+			end
+
+			-- Disable unwanted Ruby LSP servers
+			lsp.ruby_lsp.setup({ autostart = false })
+			lsp.rubocop.setup({ autostart = false })
 
 			-- Setup JetBrains Official Kotlin LSP (manual configuration)
 			-- Note: Requires the kotlin-lsp to be installed separately

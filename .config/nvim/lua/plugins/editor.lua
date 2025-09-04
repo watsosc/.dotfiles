@@ -183,7 +183,19 @@ return {
 		"folke/flash.nvim",
 		event = "VeryLazy",
 		vscode = false,
-		opts = {},
+		opts = {
+			modes = {
+				-- Disable the default 's' key for Flash to allow mini.surround to use it
+				char = {
+					enabled = false,
+				},
+			},
+		},
+		keys = {
+			-- Use different keys for Flash functionality
+			{ "f", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+			{ "F", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+		},
 	},
 	{ -- Useful plugin to show you pending keybinds.
 		"folke/which-key.nvim",

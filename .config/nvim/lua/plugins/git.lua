@@ -30,6 +30,8 @@ return {
 			local keymap = vim.keymap
 
 			keymap.set("n", "<leader>gt", ":G<CR>", { desc = "[G]it S[t]atus" })
+			keymap.set("n", "<leader>gB", ":G branch<CR>", { desc = "[G]it [B]ranches (select to checkout)" })
+			keymap.set("n", "<leader>gd", ":DiffviewFileHistory %<CR>", { desc = "[G]it [D]iff current file" })
 			keymap.set("n", "<leader>gs", ":Gwrite<CR>", { desc = "[G]it [S]tage" })
 			keymap.set("n", "<leader>gc", ":G commit<CR>", { desc = "[G]it [C]ommit" })
 			keymap.set("n", "<leader>gp", ":G push<CR>", { desc = "[G]it [P]ush" })
