@@ -2,6 +2,13 @@ return {
   {
     'mfussenegger/nvim-dap',
     dependencies = {
+      'nvim-neotest/nvim-nio',
+      {
+        'rcarriga/nvim-dap-ui',
+        config = function()
+          require('dapui').setup()
+        end,
+      },
       'suketa/nvim-dap-ruby',
     },
     config = function()
@@ -28,6 +35,11 @@ return {
       map('n', '<leader>dn', dap.step_into, { desc = 'DAP: Step into' })
       map('n', '<leader>dN', dap.step_back, { desc = 'DAP: Step back' })
       map('n', '<leader>dr', dap.repl.toggle, { desc = 'DAP: Toggle REPL' })
+      map('n', '<leader>dl', dap.run_last, { desc = 'DAP: Run last' })
+      map('n', '<leader>du', function()
+        require('dapui').toggle({})
+      end, { desc = 'DAP: Toggle UI' })
+      map('n', '<leader>dt', dap.terminate, { desc = 'DAP: Terminate' })
       map('n', '<leader>d.', dap.goto_, { desc = 'DAP: Go to' })
       map('n', '<leader>dh', dap.run_to_cursor, { desc = 'DAP: Run to cursor' })
       map('n', '<leader>de', dap.set_exception_breakpoints, { desc = 'DAP: Set exception breakpoints' })

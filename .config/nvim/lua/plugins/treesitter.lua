@@ -35,7 +35,6 @@ return {
         'markdown',
         'haskell',
         'ruby',
-        'kotlin',
         'query',
       },
       sync_install = false,

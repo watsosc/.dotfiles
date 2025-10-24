@@ -37,7 +37,6 @@ return {
 				ruby = { "rubocop" },
 				typescript = { "prettier" },
 				yaml = { "prettier" },
-				kotlin = { "ktlint" },
 				sh = { "shfmt" },
 				bash = { "shfmt" },
 				-- Conform can also run multiple formatters sequentially
@@ -48,8 +47,8 @@ return {
 			},
 			formatters = {
 				rubocop = {
-					command = "bundle",
-					args = { "exec", "rubocop", "--stdin", "$FILENAME", "--format", "quiet", "--stderr", "--autocorrect" },
+					command = vim.fn.expand("~/.config/nvim/rubocop-formatter-wrapper.sh"),
+					args = { "--auto-correct-all", "--format", "quiet", "--stderr", "--stdin", "$FILENAME" },
 					stdin = true,
 				},
 				shfmt = {

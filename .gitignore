@@ -1,1 +1,13 @@
 **/.claude/settings.local.json
+
+# Exclude specific .config directories
+.config/psst/
+.config/dev/
+.config/shadowenv/
+.config/containers/
+.config/gcloud/
+.config/graphite/
+.config/stripe/
+.config/op/
+.config/uv/
+.config/github-copilot/

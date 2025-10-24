@@ -164,3 +164,6 @@ if [[ -z "$ZELLIJ" && -z "$SSH_CONNECTION" && -z "$INSIDE_EMACS" && "$TERM_PROGR
         zellij
     fi
 fi
+
+# Added by tec agent
+[[ -x /Users/seanwatson/.local/state/tec/profiles/base/current/global/init ]] && eval "$(/Users/seanwatson/.local/state/tec/profiles/base/current/global/init zsh)"

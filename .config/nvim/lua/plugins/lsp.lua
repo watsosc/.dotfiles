@@ -42,6 +42,7 @@ return {
 			"jay-babu/mason-null-ls.nvim",
 			{
 				"pmizio/typescript-tools.nvim",
+				ft = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
 				dependencies = { "nvim-lua/plenary.nvim" },
 				config = function()
 					local nvim_lsp = require("lspconfig")
@@ -94,12 +95,6 @@ return {
 			--    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
 			--    function will be executed to configure the current buffer
 			local lsp = require("lspconfig")
-
-			local function has_sorbet_directory()
-				local sorbet_dir = vim.fn.finddir("sorbet", vim.fn.getcwd() .. ";")
-				return sorbet_dir ~= ""
-			end
-
 
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
@@ -226,7 +221,6 @@ return {
 					"eslint",
 					"jsonls",
 					"stylelint_lsp",
-					"shfmt",
 				},
 				handlers = {
 					default_setup,
@@ -248,71 +242,13 @@ return {
 				},
 			})
 
-			-- Configure Sorbet LSP for Ruby projects
-			if has_sorbet_directory() then
-				lsp.sorbet.setup({
-					mason = false,
-					cmd = { "bundle", "exec", "srb", "tc", "--lsp" },
-					capabilities = capabilities,
-					filetypes = { "ruby", "eruby", "rake", "irb", "rbi" },
-					root_dir = function(fname)
-						local util = require("lspconfig.util")
-						return util.root_pattern("sorbet/config", "Gemfile", ".git")(fname)
-							or util.find_git_ancestor(fname)
-							or util.path.dirname(fname)
-					end,
-					single_file_support = true,
-					settings = {},
-					init_options = {
-						highlightUntyped = false,
-					},
-					handlers = {
-						["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
-							-- Filter out T.untyped related diagnostics
-							if result and result.diagnostics then
-								result.diagnostics = vim.tbl_filter(function(diagnostic)
-									local message = diagnostic.message or ""
-									-- Filter out common T.untyped messages
-									return not (
-										message:match("T%.untyped") or
-										message:match("This code is unreachable") or
-										message:match("Method .* does not exist on T%.untyped") or
-										message:match("Call to method .* on T%.untyped")
-									)
-								end, result.diagnostics)
-							end
-							-- Call the default handler
-							vim.lsp.handlers["textDocument/publishDiagnostics"](err, result, ctx, config)
-						end,
-					},
-				})
-			end
+			-- Note: Ruby LSP configuration (ruby_lsp and sorbet) is now handled
+			-- by the separate ruby.lua plugin which provides per-project LSP
+			-- management with shadowenv support
 
-			-- Disable unwanted Ruby LSP servers
-			lsp.ruby_lsp.setup({ autostart = false })
-			lsp.rubocop.setup({ autostart = false })
-
-			-- Setup JetBrains Official Kotlin LSP (manual configuration)
-			-- Note: Requires the kotlin-lsp to be installed separately
-			-- Download from: https://github.com/Kotlin/kotlin-lsp
-			lsp.kotlin_lsp = {
-				default_config = {
-					cmd = { "kotlin-lsp" },
-					filetypes = { "kotlin" },
-					root_dir = lsp.util.root_pattern("build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts"),
-					settings = {},
-				},
-			}
-
-			lsp.kotlin_lsp.setup({
-				capabilities = capabilities,
-				cmd = { "kotlin-lsp" },
-				filetypes = { "kotlin" },
-				root_dir = lsp.util.root_pattern("build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts"),
-			})
 
 			require("mason-null-ls").setup({
-				ensure_installed = { "ktlint" },
+				ensure_installed = {},
 				automatic_installation = false,
 				handlers = {},
 			})

@@ -1,3 +1,11 @@
+-- Only load copilot if github-copilot directory exists
+local config_home = vim.env.XDG_CONFIG_HOME or vim.fn.expand("~/.config")
+local copilot_dir = config_home .. "/github-copilot"
+
+if vim.fn.isdirectory(copilot_dir) == 0 then
+	return {}
+end
+
 local M = {}
 
 ---@param kind string
