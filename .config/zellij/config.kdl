@@ -539,6 +539,9 @@ serialize_pane_viewport true
 // Default: true
 // 
 // stacked_resize false
+
+// Minimum pane size to prevent collapsing
+minimum_pane_size 10
  
 // Whether to show tips on startup
 // Default: true

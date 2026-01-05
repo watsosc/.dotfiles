@@ -122,7 +122,7 @@ alias gcfi='git commit --fixup'
 alias glog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all"
 
 alias cv='dev cd customerview-mobile'
-alias pos='dev cd pos-next-react-native'
+alias pos='dev cd //areas/clients/pos-mobile'
 alias shopify='dev cd //areas/core/shopify'
 alias pos-channel='dev cd pos-channel'
 alias web='dev cd //areas/clients/admin-web'
