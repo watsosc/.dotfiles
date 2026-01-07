@@ -120,12 +120,16 @@ function spinssh() {
 alias grsm='git reset --soft $(git_main_branch)'
 alias gcfi='git commit --fixup'
 alias glog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all"
+alias gtup='gt get && dev up'
+alias gtre='gt get && gt submit'
 
 alias cv='dev cd customerview-mobile'
 alias pos='dev cd //areas/clients/pos-mobile'
 alias shopify='dev cd //areas/core/shopify'
 alias pos-channel='dev cd pos-channel'
 alias web='dev cd //areas/clients/admin-web'
+alias shop-server='dev cd shop-server'
+alias shop-client='dev cd shop-client'
 
 [ -f /opt/dev/dev.sh ] && source /opt/dev/dev.sh
 if [ -e /Users/seanwatson/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/seanwatson/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
@@ -167,3 +171,9 @@ fi
 
 # Added by tec agent
 [[ -x /Users/seanwatson/.local/state/tec/profiles/base/current/global/init ]] && eval "$(/Users/seanwatson/.local/state/tec/profiles/base/current/global/init zsh)"
+
+# opencode
+export PATH=/Users/seanwatson/.opencode/bin:$PATH
+
+# Load AI agent tokens (this file is gitignored and contains secrets)
+[[ -f ~/.dotfiles/.zshrc.ai-tokens ]] && source ~/.dotfiles/.zshrc.ai-tokens

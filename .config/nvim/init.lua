@@ -77,6 +77,10 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- 0.12: global rounded borders on all floating windows (hover, signature, diagnostics, etc.)
+vim.opt.winborder = "rounded"
+
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -86,6 +90,9 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+
+-- 0.12: built-in undo tree (no plugin needed)
+vim.keymap.set("n", "<leader>u", vim.cmd.Undotree, { desc = "Toggle [U]ndo Tree" })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -142,44 +149,4 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
--- Only set up copilot autocmds if github-copilot directory exists
-local config_home = vim.env.XDG_CONFIG_HOME or vim.fn.expand("~/.config")
-local copilot_dir = config_home .. "/github-copilot"
 
-if vim.fn.isdirectory(copilot_dir) == 1 then
-	vim.api.nvim_create_autocmd("User", {
-		pattern = "BlinkCmpCompletionMenuOpen",
-		callback = function()
-			require("copilot.suggestion").dismiss()
-			vim.b.copilot_suggestion_hidden = true
-		end,
-	})
-
-	vim.api.nvim_create_autocmd("User", {
-		pattern = "BlinkCmpCompletionMenuClose",
-		callback = function()
-			vim.b.copilot_suggestion_hidden = false
-		end,
-	})
-end
-
--- [[ Install `lazy.nvim` plugin manager ]]
---    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-	vim.fn.system({
-		"git",
-		"clone",
-		"--filter=blob:none",
-		"https://github.com/folke/lazy.nvim.git",
-		"--branch=stable",
-		lazypath,
-	})
-end ---@diagnostic disable-next-line: undefined-field
-vim.opt.rtp:prepend(lazypath)
-
-require("lazy").setup("plugins", {
-	change_detection = {
-		notify = false,
-	},
-})

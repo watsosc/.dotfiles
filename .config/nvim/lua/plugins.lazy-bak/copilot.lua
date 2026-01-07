@@ -25,14 +25,12 @@ return {
 	{
 		"zbirenbaum/copilot.lua",
 		opts = {
+			copilot_node_command = vim.fn.expand("~/.nvm/versions/node/v22.18.0/bin/node"),
 			suggestion = {
 				auto_trigger = true,
 				keymap = {
 					accept = "<C-j>",
 				},
-			},
-			server_opts_overrides = {
-				nodeCommand = "node", -- Try using explicit node path if needed
 			},
 		},
 		-- Force reinstall to fix missing files

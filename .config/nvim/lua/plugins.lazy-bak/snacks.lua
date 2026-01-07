@@ -44,8 +44,4 @@ return {
 			{ "<leader>sts", function() Snacks.picker.git_status() end, desc = "[S]earch [G]it [S]tatus" },
 		},
 	},
-	{
-		"numToStr/Comment.nvim",
-		opts = {},
-	},
 }

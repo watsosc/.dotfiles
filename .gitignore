@@ -1,5 +1,17 @@
 **/.claude/settings.local.json
 
+# Private environment files with secrets
+.zshrc.ai-tokens
+
+# Credentials and tokens
+.config/quick/
+
+# Chrome/browser profile data
+.config/web-production-validation/
+
+# Shopify-specific tooling (internal plugins/config)
+.config/opencode-shopify/
+
 # Exclude specific .config directories
 .config/psst/
 .config/dev/
@@ -11,3 +23,4 @@
 .config/op/
 .config/uv/
 .config/github-copilot/
+.config/opencode/

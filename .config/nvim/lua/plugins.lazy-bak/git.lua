@@ -32,7 +32,42 @@ return {
 			keymap.set("n", "<leader>gt", ":G<CR>", { desc = "[G]it S[t]atus" })
 			keymap.set("n", "<leader>gB", ":G branch<CR>", { desc = "[G]it [B]ranches (select to checkout)" })
 			keymap.set("n", "<leader>gd", ":DiffviewFileHistory %<CR>", { desc = "[G]it [D]iff current file" })
-			keymap.set("n", "<leader>gs", ":Gwrite<CR>", { desc = "[G]it [S]tage" })
+
+			-- Stage files with preview using Snacks picker
+			keymap.set("n", "<leader>gs", function()
+				Snacks.picker.git_status({
+					prompt = "Stage Files (Tab=select, s=stage, u=unstage)",
+					actions = {
+						files = {
+							["s"] = function(picker, items)
+								-- Stage selected files
+								for _, item in ipairs(items) do
+									vim.fn.system({"git", "add", "--", item.file})
+								end
+								vim.notify("Staged " .. #items .. " file(s)", vim.log.levels.INFO)
+								picker:refresh()
+							end,
+							["u"] = function(picker, items)
+								-- Unstage selected files
+								for _, item in ipairs(items) do
+									vim.fn.system({"git", "reset", "HEAD", "--", item.file})
+								end
+								vim.notify("Unstaged " .. #items .. " file(s)", vim.log.levels.INFO)
+								picker:refresh()
+							end,
+							["<cr>"] = function(picker, items)
+								-- Stage on Enter
+								for _, item in ipairs(items) do
+									vim.fn.system({"git", "add", "--", item.file})
+								end
+								vim.notify("Staged " .. #items .. " file(s)", vim.log.levels.INFO)
+								picker:refresh()
+							end,
+						},
+					},
+				})
+			end, { desc = "[G]it [S]tage files (with preview)" })
+
 			keymap.set("n", "<leader>gc", ":G commit<CR>", { desc = "[G]it [C]ommit" })
 			keymap.set("n", "<leader>gp", ":G push<CR>", { desc = "[G]it [P]ush" })
 			keymap.set("n", "<leader>ga", ":G add --all", { desc = "[G]it Add [A]ll" })

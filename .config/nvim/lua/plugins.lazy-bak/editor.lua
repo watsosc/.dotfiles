@@ -70,31 +70,32 @@ return {
 
 			-- Add/delete/replace surroundings (brackets, quotes, etc.)
 			--
-			-- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-			-- - sd'   - [S]urround [D]elete [']quotes
-			-- - sr)'  - [S]urround [R]eplace [)] [']
-			require("mini.surround").setup()
+			-- Operator-style: s{motion}{char}
+			-- - siw)  surround inner word with parens  → (word)
+			-- - siw"  surround inner word with quotes  → "word"
+			-- - ss)   surround current line with parens
+			-- - ds)   delete surrounding parens
+			-- - cs)"  change surrounding ) to "
+			-- In visual mode: select text, then s{char}
+			require("mini.surround").setup({
+				n_lines = 500,
+				mappings = {
+					add = "s",            -- s{motion}{char} — overrides bare 's' (was cl)
+					delete = "ds",         -- ds{char}
+					replace = "cs",        -- cs{old}{new}
+					find = "sf",
+					find_left = "sF",
+					highlight = "sh",
+					update_n_lines = "sn",
+				},
+			})
 
 			require("mini.pairs").setup()
-
-			-- Simple and easy statusline.
-			--  You could remove this setup call if you don't like it,
-			--  and try some other statusline plugin
-			local statusline = require("mini.statusline")
-			-- set use_icons to true if you have a Nerd Font
-			statusline.setup({ use_icons = vim.g.have_nerd_font })
-
-			-- You can configure sections in the statusline by overriding their
-			-- default behavior. For example, here we set the section for
-			-- cursor location to LINE:COLUMN
-			---@diagnostic disable-next-line: duplicate-set-field
-			statusline.section_location = function()
-				return "%2l:%-2v"
-			end
 		end,
 	},
 	{
 		"nvim-tree/nvim-tree.lua",
+		lazy = false,
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
@@ -102,6 +103,10 @@ return {
 			sync_root_with_cwd = true,
 			disable_netrw = true,
 			hijack_cursor = true,
+			hijack_directories = {
+				enable = true,
+				auto_open = true,
+			},
 			update_focused_file = {
 				enable = true,
 				update_cwd = true,
@@ -162,6 +167,30 @@ return {
 			{ "<C-n>",     vim.cmd.NvimTreeToggle },
 			{ "<leader>n", vim.cmd.NvimTreeFindFile },
 		},
+		init = function()
+			-- Open nvim-tree when opening a directory
+			vim.api.nvim_create_autocmd("VimEnter", {
+				callback = function(data)
+					-- Check if the argument is a directory
+					local directory = vim.fn.isdirectory(data.file) == 1
+					if not directory then
+						return
+					end
+
+					-- Change to the directory
+					vim.cmd.cd(data.file)
+
+					-- Open nvim-tree
+					require("nvim-tree.api").tree.open()
+
+					-- Close the invalid buffer that was created
+					local bufnr = data.buf
+					if vim.api.nvim_buf_is_valid(bufnr) then
+						vim.api.nvim_buf_delete(bufnr, { force = true })
+					end
+				end,
+			})
+		end,
 	},
 	{
 		"stevearc/aerial.nvim",
@@ -185,16 +214,16 @@ return {
 		vscode = false,
 		opts = {
 			modes = {
-				-- Disable the default 's' key for Flash to allow mini.surround to use it
+				-- Keep native f/F/t/T motions; flash is on gs/gS instead
 				char = {
 					enabled = false,
 				},
 			},
 		},
 		keys = {
-			-- Use different keys for Flash functionality
-			{ "f", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
-			{ "F", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+			-- gs = flash jump (s is now mini.surround; f/F remain native find-char motions)
+			{ "gs", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash Jump" },
+			{ "gS", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
 		},
 	},
 	{ -- Useful plugin to show you pending keybinds.
@@ -251,6 +280,7 @@ return {
 				{ "<leader>h", group = "[H]arpoon" },
 				{ "<leader>x", group = "Trouble" },
 				{ "<leader>z", group = "[Z]en" },
+				{ "<leader>u", group = "[U]ndo" },
 			},
 		},
 	},
