@@ -239,6 +239,8 @@ return {
 							},
 						})
 					end,
+					-- Disable sorbet default setup - handled by ruby.lua plugin
+					sorbet = function() end,
 				},
 			})
 
