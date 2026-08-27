@@ -111,7 +111,10 @@ do
     local dir = vim.fs.dirname(path)
     if not dir or dir == '' then return nil end
     local found = vim.fs.find(markers, { upward = true, path = dir, stop = vim.uv.os_homedir() })
-    return #found > 0 and vim.fs.dirname(found[1]) or nil
+    if #found == 0 then return nil end
+    local root = vim.fs.dirname(found[1])
+    if #markers == 1 and markers[1] == 'sorbet/config' then root = vim.fs.dirname(root) end
+    return root
   end
 
   local function attach_existing(client_id, bufnr)
@@ -143,6 +146,7 @@ do
       name         = string.format('%s(%s)', kind, project_label(root)),
       cmd          = cmd_fn(root),
       root_dir     = root,
+      cmd_cwd      = root,
       capabilities = make_capabilities(),
       on_exit = function(code)
         if code == 1 then

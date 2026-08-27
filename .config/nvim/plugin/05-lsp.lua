@@ -10,6 +10,7 @@ vim.pack.add({
   gh('nvimtools/none-ls.nvim'),
   gh('jay-babu/mason-null-ls.nvim'),
   gh('tpope/vim-rails'),
+  gh('shopify-playground/hover-hints.nvim'),
 })
 
 -- lazydev: Lua LSP type annotations for Neovim runtime/config/plugins
@@ -17,6 +18,14 @@ require('lazydev').setup({
   library = {
     { path = 'luvit-meta/library', words = { 'vim%.uv' } },
   },
+})
+
+require('hover-hints').setup({
+  filetypes = { 'ruby' },
+  code_only = true,
+  prefix = '  ',
+  max_width = 100,
+  keymap = '<leader>lh',
 })
 
 -- LspAttach: keymaps and per-buffer LSP features
@@ -48,7 +57,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     map('<leader>wd',  vim.lsp.buf.workspace_diagnostics, '[W]orkspace [D]iagnostics')
 
     local client = vim.lsp.get_client_by_id(event.data.client_id)
-    if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+    if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
       local hl_group = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
       vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
         buffer = event.buf, group = hl_group, callback = vim.lsp.buf.document_highlight,
@@ -65,10 +74,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
       })
     end
 
-    if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-      map('<leader>th', function()
+    if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+      vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+      map('<leader>li', function()
         vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
-      end, '[T]oggle Inlay [H]ints')
+      end, '[L]SP: Toggle [I]nlay Hints')
     end
   end,
 })
@@ -120,23 +130,53 @@ null_ls.setup({
   },
 })
 
--- typescript-tools: lazy-loaded on first TypeScript/JavaScript buffer
-vim.api.nvim_create_autocmd({ 'BufReadPre', 'BufNewFile' }, {
-  pattern  = { '*.ts', '*.tsx', '*.js', '*.jsx' },
+-- typescript-tools: TS/JS LSP driving the project-local tsserver directly
+-- (ts_ls/vtsls can't be used here — global npm installs are blocked in this env).
+--
+-- Loaded on FileType so vim.lsp.enable can attach to the launch buffer and later
+-- TS/JS buffers through the native Neovim 0.12 LSP configuration.
+--
+-- If TS LSP still fails to attach after a plugin update, pin typescript-tools to a
+-- known-good revision in the vim.pack.add call below, e.g.:
+--   { src = gh('pmizio/typescript-tools.nvim'), version = '<commit-sha>' }
+local function find_working_npm_dir()
+  for _, dir in ipairs(vim.split(vim.env.PATH or '', ':', { plain = true })) do
+    local npm = vim.fs.joinpath(dir, 'npm')
+    if vim.fn.executable(npm) == 1 then
+      vim.fn.system({ npm, 'root', '-g' })
+      if vim.v.shell_error == 0 then return dir end
+    end
+  end
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern  = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
   once     = true,
   callback = function()
     vim.pack.add({
       gh('nvim-lua/plenary.nvim'), -- ensure available
       gh('pmizio/typescript-tools.nvim'),
     })
+
+    local npm_dir = find_working_npm_dir()
+    if npm_dir then vim.env.PATH = npm_dir .. ':' .. vim.env.PATH end
     require('typescript-tools').setup({
       settings = {
         tsserver_max_memory = 10240,
-        root_dir            = require('lspconfig.util').root_pattern('package.json'),
+        tsserver_file_preferences = {
+          includeInlayParameterNameHints = 'all',
+          includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayVariableTypeHints = true,
+          includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayEnumMemberValueHints = true,
+        },
       },
-      on_attach = function(client)
+      on_attach  = function(client)
         client.server_capabilities.documentFormattingProvider      = false
-        client.server_capabilities.documentFormattingRangeProvider = false
+        client.server_capabilities.documentRangeFormattingProvider = false
       end,
     })
   end,

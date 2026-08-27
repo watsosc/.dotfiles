@@ -59,6 +59,7 @@ require('which-key').setup({
   spec = {
     { '<leader>c', group = '[C]ode',      mode = { 'n', 'x' } },
     { '<leader>d', group = '[D]ocument' },
+    { '<leader>l', group = '[L]SP' },
     { '<leader>g', group = '[G]it' },
     { '<leader>r', group = '[R]ename' },
     { '<leader>s', group = '[S]earch' },
@@ -68,7 +69,6 @@ require('which-key').setup({
     { '<leader>x', group = 'Trouble' },
     { '<leader>z', group = '[Z]en' },
     { '<leader>u', group = '[U]ndo' },
-    { '<leader>o', group = '[A]I (Copilot)' },
   },
 })
 

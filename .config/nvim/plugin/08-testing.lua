@@ -68,9 +68,12 @@ dap.configurations.javascript = dap.configurations.typescript
 
 require('dap-ruby').setup()
 
--- neotest: lazy-loaded when a test-like buffer is added
-vim.api.nvim_create_autocmd('BufAdd', {
-  pattern  = { '*test*', '*spec*' },
+-- neotest: lazy-loaded on the first testable filetype.
+-- Using FileType (not BufAdd) so it also fires for the buffer nvim is launched with;
+-- BufAdd+once previously missed the startup buffer, leaving <leader>t* mappings
+-- calling require('neotest') before it was ever loaded.
+vim.api.nvim_create_autocmd('FileType', {
+  pattern  = { 'ruby', 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'lua', 'python' },
   once     = true,
   callback = function()
     vim.pack.add({

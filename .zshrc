@@ -123,12 +123,41 @@ alias glog="git log --graph --abbrev-commit --decorate --format=format:'%C(bold 
 alias gtup='gt get && dev up'
 alias gtre='gt get && gt submit'
 
+function gget() {
+	local branch
+	branch=$(git branch --show-current)
+
+	if [[ -z "$branch" ]]; then
+		echo "gget: not on a branch" >&2
+		return 1
+	fi
+
+	if [[ "$branch" == "main" ]]; then
+		git fetch --no-tags --no-write-fetch-head -f origin refs/heads/main:refs/remotes/origin/main
+		git merge --ff-only origin/main
+	else
+		git fetch --no-tags --no-write-fetch-head -f origin refs/heads/main:refs/remotes/origin/main
+		# Best-effort: update the branch's remote-tracking ref if it has been pushed.
+		# Unpushed branches have no remote ref, so ignore failures here.
+		git fetch --no-tags --no-write-fetch-head -f origin "refs/heads/${branch}:refs/remotes/origin/${branch}" 2>/dev/null
+
+		local stashed=0
+		if [[ -n "$(git status --porcelain)" ]]; then
+			git stash push -u -m "gget-autostash" && stashed=1
+		fi
+
+		git rebase origin/main
+
+		(( stashed )) && git stash pop
+	fi
+}
+
 alias cv='dev cd customerview-mobile'
 alias pos='dev cd //areas/clients/pos-mobile'
 alias shopify='dev cd //areas/core/shopify'
 alias pos-channel='dev cd pos-channel'
 alias web='dev cd //areas/clients/admin-web'
-alias shop-server='dev cd shop-server'
+alias shop-server='dev cd //areas/platforms/shop-server'
 alias shop-client='dev cd shop-client'
 
 [ -f /opt/dev/dev.sh ] && source /opt/dev/dev.sh
@@ -174,6 +203,173 @@ fi
 
 # opencode
 export PATH=/Users/seanwatson/.opencode/bin:$PATH
+export DISABLE_SPRING=1
 
 # Load AI agent tokens (this file is gitignored and contains secrets)
 [[ -f ~/.dotfiles/.zshrc.ai-tokens ]] && source ~/.dotfiles/.zshrc.ai-tokens
+
+# gsyn - replicates `gt sync` using raw git commands with stack awareness
+# 1. Fetch from origin (prune stale remote-tracking branches)
+# 2. Fast-forward (or reset) local trunk to match origin
+# 3. Discover stack parentage from GitHub PR base branches
+# 4. Restack all branches in topological order (parent before child)
+# 5. Re-parent children of deleted branches, then prompt to delete
+function gsyn() {
+  local trunk="main"
+  local current_branch
+  current_branch=$(git branch --show-current)
+
+  if [[ -z "$current_branch" ]]; then
+    echo "gsyn: not on a branch (detached HEAD)" >&2
+    return 1
+  fi
+
+  # 0. Stash local changes so rebases/checkouts run on a clean tree
+  local stashed=0
+  if [[ -n "$(git status --porcelain)" ]]; then
+    echo "📦 Stashing local changes..."
+    git stash push -u -m "gsyn-autostash" && stashed=1
+  fi
+
+  # 1. Fetch with prune so merged remote branches disappear
+  echo "🔄 Fetching from origin..."
+  if ! git fetch --no-tags origin 2>/dev/null; then
+    # Fetch can fail on stale refs (e.g. deleted Graphite MQ branches).
+    # Prune first to remove them, then retry.
+    git remote prune origin 2>/dev/null
+    if ! git fetch --no-tags origin; then
+      echo "❌ Fetch failed" >&2
+      return 1
+    fi
+  fi
+  git remote prune origin 2>/dev/null
+
+  # 2. Update local trunk to match remote trunk (no network — already fetched above)
+  echo "🔄 Updating $trunk..."
+  if [[ "$current_branch" == "$trunk" ]]; then
+    if ! git merge --ff-only "origin/$trunk" 2>/dev/null; then
+      echo "⚠️  Fast-forward failed — resetting $trunk to origin/$trunk"
+      git reset --hard "origin/$trunk"
+    fi
+  else
+    git branch -f "$trunk" "origin/$trunk" 2>/dev/null
+  fi
+
+  # 3. Discover stack parentage from PR base branches (single API call)
+  echo "🔍 Discovering stack..."
+  local -a local_branches
+  local_branches=(${(f)"$(git branch --format='%(refname:short)' | grep -v "^${trunk}$")"})
+
+  typeset -A parent_of
+  local pr_json
+  pr_json=$(gh api graphql -f query='{
+    viewer {
+      pullRequests(first: 100, states: OPEN) {
+        nodes { headRefName baseRefName }
+      }
+    }
+  }' 2>/dev/null)
+
+  for branch in "${local_branches[@]}"; do
+    local base
+    base=$(echo "$pr_json" | jq -r --arg b "$branch" \
+      '.data.viewer.pullRequests.nodes[] | select(.headRefName == $b) | .baseRefName' 2>/dev/null)
+    if [[ -n "$base" && "$base" != "null" ]]; then
+      parent_of[$branch]="$base"
+    fi
+  done
+
+  # Current branch always gets restacked (default to trunk if no PR)
+  if [[ "$current_branch" != "$trunk" && -z "${parent_of[$current_branch]}" ]]; then
+    parent_of[$current_branch]="$trunk"
+  fi
+
+  # 4. Topological restack: BFS from trunk outward so parents are rebased before children
+  if [[ "$current_branch" != "$trunk" ]]; then
+    echo "🔄 Restacking..."
+    local -a queue=("$trunk")
+    local -a restacked=()
+    local -a skipped=()
+
+    while [[ ${#queue[@]} -gt 0 ]]; do
+      local parent="${queue[1]}"
+      queue=("${queue[@]:1}")
+
+      for branch in "${local_branches[@]}"; do
+        # Skip if no known parent or already processed
+        [[ -z "${parent_of[$branch]}" ]] && continue
+        (( ${restacked[(Ie)$branch]} )) && continue
+        (( ${skipped[(Ie)$branch]} )) && continue
+        [[ "${parent_of[$branch]}" != "$parent" ]] && continue
+
+        git checkout "$branch" --quiet 2>/dev/null || { skipped+=("$branch"); continue; }
+        if git rebase "$parent" --quiet 2>/dev/null; then
+          echo "   ✓ $branch → $parent"
+          restacked+=("$branch")
+          queue+=("$branch")
+        else
+          echo "   ⚠️  $branch — conflicts (skipped)"
+          git rebase --abort 2>/dev/null
+          skipped+=("$branch")
+        fi
+      done
+    done
+
+    git checkout "$current_branch" --quiet 2>/dev/null
+  fi
+
+  # 5. Clean up merged branches
+  local -a gone_branches=()
+  while IFS= read -r branch; do
+    [[ -n "$branch" ]] && gone_branches+=("$branch")
+  done < <(git branch -vv | grep ': gone]' | awk '{print $1}')
+
+  if [[ ${#gone_branches[@]} -gt 0 ]]; then
+    # Re-parent children of branches about to be deleted
+    for gone in "${gone_branches[@]}"; do
+      local gone_parent="${parent_of[$gone]:-$trunk}"
+      for branch in "${local_branches[@]}"; do
+        if [[ "${parent_of[$branch]}" == "$gone" ]]; then
+          echo "   ↪ Re-parenting $branch → $gone_parent (was → $gone)"
+          git checkout "$branch" --quiet 2>/dev/null || continue
+          if git rebase "$gone_parent" --quiet 2>/dev/null; then
+            parent_of[$branch]="$gone_parent"
+          else
+            echo "   ⚠️  Re-parenting $branch failed — conflicts"
+            git rebase --abort 2>/dev/null
+          fi
+        fi
+      done
+    done
+
+    # Switch to trunk if current branch will be deleted
+    if (( ${gone_branches[(Ie)$current_branch]} )); then
+      echo "   ↪ Switching to $trunk ($current_branch will be deleted)"
+      current_branch="$trunk"
+    fi
+    git checkout "$current_branch" --quiet 2>/dev/null
+
+    echo ""
+    echo "🗑  ${#gone_branches[@]} branch(es) with merged/closed PRs:"
+    for b in "${gone_branches[@]}"; do
+      echo "   - $b"
+    done
+    echo ""
+    read "reply?Delete them? [Y/n] "
+    if [[ "$reply" != "n" && "$reply" != "N" ]]; then
+      for b in "${gone_branches[@]}"; do
+        git branch -D "$b" && echo "   ✓ $b"
+      done
+    else
+      echo "   Skipped."
+    fi
+  fi
+
+  # Restore stashed changes now that all rebases are done
+  if (( stashed )); then
+    echo "📦 Restoring stashed changes..."
+    git stash pop
+  fi
+
+  echo "✅ Sync complete."
+}
