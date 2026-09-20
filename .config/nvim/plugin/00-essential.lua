@@ -48,11 +48,16 @@ sp('<leader>stb', function() Snacks.picker.git_branches() end,     '[S]earch Git
 sp('<leader>stc', function() Snacks.picker.git_log() end,          '[S]earch Git [C]ommits')
 sp('<leader>sts', function() Snacks.picker.git_status() end,       '[S]earch Git [S]tatus')
 
--- Shadowenv: priority=100 equivalent — load early for correct env before LSP starts
-vim.pack.add({ gh('Shopify/shadowenv.vim') })
-vim.api.nvim_create_autocmd({ 'DirChanged', 'VimEnter' }, {
-  callback = function() vim.cmd('silent! ShadowenvHook') end,
-})
+-- Shadowenv (optional): only load when binary exists.
+-- Keeps personal machines/worktrees without shadowenv from showing startup errors.
+if vim.fn.executable('shadowenv') == 1 then
+  vim.pack.add({ gh('Shopify/shadowenv.vim') })
+  vim.api.nvim_create_autocmd({ 'DirChanged', 'VimEnter' }, {
+    callback = function()
+      if vim.fn.exists(':ShadowenvHook') == 2 then vim.cmd('silent! ShadowenvHook') end
+    end,
+  })
+end
 
 -- Colorscheme: load early so subsequent plugins inherit correct highlight groups
 vim.pack.add({ gh('catppuccin/nvim') })

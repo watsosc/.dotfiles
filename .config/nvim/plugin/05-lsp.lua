@@ -10,8 +10,10 @@ vim.pack.add({
   gh('nvimtools/none-ls.nvim'),
   gh('jay-babu/mason-null-ls.nvim'),
   gh('tpope/vim-rails'),
-  gh('shopify-playground/hover-hints.nvim'),
 })
+
+-- Optional/private plugin: never let install/auth failures break all LSP setup.
+local hover_hints_available = pcall(vim.pack.add, { gh('shopify-playground/hover-hints.nvim') })
 
 -- lazydev: Lua LSP type annotations for Neovim runtime/config/plugins
 require('lazydev').setup({
@@ -20,13 +22,18 @@ require('lazydev').setup({
   },
 })
 
-require('hover-hints').setup({
-  filetypes = { 'ruby' },
-  code_only = true,
-  prefix = '  ',
-  max_width = 100,
-  keymap = '<leader>lh',
-})
+if hover_hints_available then
+  local ok_hover_hints, hover_hints = pcall(require, 'hover-hints')
+  if ok_hover_hints then
+    hover_hints.setup({
+      filetypes = { 'ruby' },
+      code_only = true,
+      prefix = '  ',
+      max_width = 100,
+      keymap = '<leader>lh',
+    })
+  end
+end
 
 -- LspAttach: keymaps and per-buffer LSP features
 vim.api.nvim_create_autocmd('LspAttach', {

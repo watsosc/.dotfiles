@@ -82,15 +82,15 @@ do
     end
 
     vim.system({ 'uv', 'tool', 'dir', '--bin' }, { text = true }, function(result)
-      local bin_dir = (result.stdout or ''):gsub('%s+$', '')
-      if result.code == 0 and vim.fn.isdirectory(bin_dir) == 1 then
-        state.uv_bin_dir = bin_dir
-        local path = vim.env.PATH or ''
-        if not vim.tbl_contains(vim.split(path, ':', { plain = true }), bin_dir) then
-          vim.env.PATH = bin_dir .. ':' .. path
-        end
-      end
       vim.schedule(function()
+        local bin_dir = (result.stdout or ''):gsub('%s+$', '')
+        if result.code == 0 and vim.fn.isdirectory(bin_dir) == 1 then
+          state.uv_bin_dir = bin_dir
+          local path = vim.env.PATH or ''
+          if not vim.tbl_contains(vim.split(path, ':', { plain = true }), bin_dir) then
+            vim.env.PATH = bin_dir .. ':' .. path
+          end
+        end
         state.path_ready = true
         state.path_pending = false
         flush_path_waiters()

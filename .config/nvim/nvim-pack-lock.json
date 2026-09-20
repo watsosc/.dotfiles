@@ -49,10 +49,6 @@
       "src": "https://github.com/ThePrimeagen/harpoon",
       "version": "'harpoon2'"
     },
-    "hover-hints.nvim": {
-      "rev": "de44d67680d8024a923a389400ee293fc2f00486",
-      "src": "https://github.com/shopify-playground/hover-hints.nvim"
-    },
     "indent-blankline.nvim": {
       "rev": "d28a3f70721c79e3c5f6693057ae929f3d9c0a03",
       "src": "https://github.com/lukas-reineke/indent-blankline.nvim"
@@ -220,10 +216,6 @@
     "vim-sleuth": {
       "rev": "be69bff86754b1aa5adcbb527d7fcd1635a84080",
       "src": "https://github.com/tpope/vim-sleuth"
-    },
-    "vim-sorbet": {
-      "rev": "c749e3799453aa1baf384e6339b14d571a74df61",
-      "src": "https://github.com/shopify/vim-sorbet"
     },
     "vim-test": {
       "rev": "36c501a89696e5ec18fb653e958957d0826e5c0b",
