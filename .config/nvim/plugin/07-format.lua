@@ -18,6 +18,7 @@ vim.api.nvim_create_autocmd({ 'BufWritePre', 'BufReadPre', 'BufNewFile' }, {
         }
       end,
       formatters_by_ft = {
+        python         = { 'ruff_format' },
         haskell        = { 'fourmolu' },
         javascript     = { 'prettier' },
         javascriptreact = { 'prettier' },
