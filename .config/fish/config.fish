@@ -9,3 +9,6 @@ if [ -f '/home/sean/google-cloud-sdk/path.fish.inc' ]; . '/home/sean/google-clou
 
 # Added by tec agent
 test -x /Users/seanwatson/.local/state/tec/profiles/base/current/global/init && /Users/seanwatson/.local/state/tec/profiles/base/current/global/init fish | source
+
+# opencode
+fish_add_path /home/sean/.opencode/bin

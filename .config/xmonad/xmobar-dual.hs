@@ -10,16 +10,15 @@
 Config
     { -- Position xmobar along the top, with stalonetray in the top right.
       -- Shrink xmobar width to ensure stalonetray and xmobar don't overlap.
-      -- stalonetrayrc-dual is configured for 12 icons, each 19px wide.
+      -- stalonetrayrc-dual is configured for 12 icons, each 23px wide/tall.
       -- Because of the dual display setup, we statically position xmobar.
-      -- Each display is 2560px wide. Offset left (x position) by one width.
-      -- xpos = display_width = 2560
-      -- If your left display is primary, then set xpos = 0.
+      -- Each display is 2560px wide.
+      -- xpos = 0 (left/primary display)
       -- ypos = 0 (top)
-      -- width = display_width - (num_icons * icon_width)
-      -- width = 2560 - (12 * 19) = 2332
-      -- height = 19
-      position = Static{xpos = 0, ypos = 0, width = 2332, height = 23}
+      -- width = display_width - (num_icons * icon_size)
+      -- width = 2560 - (12 * 23) = 2284
+      -- height = 23 (matches stalonetray icon_size)
+      position = Static { xpos = 0, ypos = 0, width = 2284, height = 23 }
     , font = "Fira Code Nerd Font"
     , bgColor = "#000000"
     , fgColor = "#ffffff"
